@@ -8,7 +8,7 @@ export function positionCircles() {
 
 }
 
-export function drawCircles() {
-
+export function drawCircles(data) {
     let pie = d3.pie().value(d => { return d.value })
+    let dataReady = pie(d3.entries(data))
 }
