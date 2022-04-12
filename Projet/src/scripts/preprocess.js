@@ -25,7 +25,7 @@ export function getLanguageLineChartData(data, province = 'None') {
 }
 
 export function getLanguagePieChartData(data) {
-    let newData = { "provinces": new Map()}
+    let newData = { "villes": new Map()}
 
     data = data.filter(element => {
         return element.pays === 'Canada' 
@@ -33,16 +33,23 @@ export function getLanguagePieChartData(data) {
     
     data.forEach(({ province, langue, ville }) => {
         // Data contains mix of accents and lower/upper cased cities names... 
-        const upperCasedCityNoAccents = ville.toUpperCase().normalize("NFD").replace(/\p{Diacritic}/gu, "") 
+        const upperCasedCityNoAccents = ville.toUpperCase().normalize("NFD").replace(/\p{Diacritic}/gu, "")
         
-        if (!newData.provinces.has(province)) {
-            newData.provinces.set(province, { 'villes': new Map() } );
-        } if (!newData.provinces.get(province).villes.has(upperCasedCityNoAccents)) {
-            newData.provinces.get(province).villes.set(upperCasedCityNoAccents, {"nbFrancais": 0, "nbAnglais": 0, "long": "", "lat": ""});
+        // if (!newData.provinces.has(province)) {
+        //     newData.provinces.set(province, { 'villes': new Map() } );
+        // } if (!newData.provinces.get(province).villes.has(upperCasedCityNoAccents)) {
+        //     newData.provinces.get(province).villes.set(upperCasedCityNoAccents, {"nbFrancais": 0, "nbAnglais": 0, "long": "", "lat": ""});
+        // }
+        // langue === 'Français' ?
+        //     newData.provinces.get(province).villes.get(upperCasedCityNoAccents).nbFrancais++ :
+        //     newData.provinces.get(province).villes.get(upperCasedCityNoAccents).nbAnglais++
+
+        if (!newData.villes.has(upperCasedCityNoAccents)) {
+            newData.villes.set(upperCasedCityNoAccents, {"nbFrancais": 0, "nbAnglais": 0});
         }
         langue === 'Français' ?
-            newData.provinces.get(province).villes.get(upperCasedCityNoAccents).nbFrancais++ :
-            newData.provinces.get(province).villes.get(upperCasedCityNoAccents).nbAnglais++
+            newData.villes.get(upperCasedCityNoAccents).nbFrancais++ :
+            newData.villes.get(upperCasedCityNoAccents).nbAnglais++
     })
 
     return newData
@@ -66,4 +73,18 @@ export function addPositionsToPieChatData(telefilmData, canData) {
         })
     })
     return telefilmData
+}
+
+export function convertCoordinates(data, projection, telefilmData) {
+
+    data.items.filter(items => {
+        return telefilmData.villes.has(items.name.toUpperCase().normalize("NFD").replace(/\p{Diacritic}/gu, "")) 
+    })
+
+    data.items.forEach(items => {
+        if (telefilmData.villes.has(items.name.toUpperCase().normalize("NFD").replace(/\p{Diacritic}/gu, ""))) {
+            items.x = projection(items.position.coordinates)[0]
+            items.y = projection(items.position.coordinates)[1]
+        } 
+    })
 }
