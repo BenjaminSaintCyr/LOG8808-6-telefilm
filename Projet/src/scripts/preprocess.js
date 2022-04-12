@@ -55,25 +55,25 @@ export function getLanguagePieChartData(data) {
     return newData
 }
 
-export function addPositionsToPieChatData(telefilmData, canData) {
-    let found = null
-    telefilmData.provinces.forEach(val => {
-        Array.from(val.villes).map(([entryKey, entryVal]) => {
-            // Maybe find a way to short-circuit the loop (array.some()?)
-            canData.forEach(({ city_ascii, lng, lat }) => {
-                if (city_ascii.toUpperCase().normalize("NFD").replace(/\p{Diacritic}/gu, "")  === entryKey) {
-                    val.villes.get(entryKey).long = lng
-                    val.villes.get(entryKey).lat = lat
-                    found = entryKey
-                    return
-                }
-            })
-            // Remove cities where no geographic coordinates were found
-            found === null ? val.villes.delete(entryKey) : found = null
-        })
-    })
-    return telefilmData
-}
+// export function addPositionsToPieChatData(telefilmData, canData) {
+//     let found = null
+//     telefilmData.provinces.forEach(val => {
+//         Array.from(val.villes).map(([entryKey, entryVal]) => {
+//             // Maybe find a way to short-circuit the loop (array.some()?)
+//             canData.forEach(({ city_ascii, lng, lat }) => {
+//                 if (city_ascii.toUpperCase().normalize("NFD").replace(/\p{Diacritic}/gu, "")  === entryKey) {
+//                     val.villes.get(entryKey).long = lng
+//                     val.villes.get(entryKey).lat = lat
+//                     found = entryKey
+//                     return
+//                 }
+//             })
+//             // Remove cities where no geographic coordinates were found
+//             found === null ? val.villes.delete(entryKey) : found = null
+//         })
+//     })
+//     return telefilmData
+// }
 
 export function convertCoordinates(data, projection, telefilmData) {
 

@@ -38,9 +38,5 @@ import * as graphs from './scripts/graphs.js'
     // d3.json('./canadaTerr.geojson').then(function (data) {
     //   graphs.mapBackground(data, path)
     // })
-    
-    // d3.csv('./canadacities.csv').then(function (data) {
-    //   circlesData = preprocess.addPositionsToPieChatData(circlesData, data)
-    // })
   }
 })(d3)
