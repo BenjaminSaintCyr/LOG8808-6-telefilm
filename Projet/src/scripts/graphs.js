@@ -122,8 +122,8 @@ export function mapBackground (data, path, showMapCentroids, circlesData) {
     .attr('fill', '#c2c1b4')
     .style('stroke', 'white')
 
-    data.features.forEach((d, i) => {
-        showMapCentroids(d, i, path, circlesData)
+    data.features.forEach((d) => {
+        showMapCentroids(d, path, circlesData)
     })
 
 }
@@ -153,7 +153,7 @@ export function mapMarkers(data) {
         .attr('class', 'marker')
 }
 
-export function showMapCentroids (d, i, path, circlesData) {
+export function showMapCentroids (d, path, circlesData) {
     let pie = d3.pie().value(dat => dat)
     const province = circlesData.provinces.get(d.properties.name)
     const [x, y] = path.centroid(d)
