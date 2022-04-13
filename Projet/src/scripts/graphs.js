@@ -121,7 +121,8 @@ export function mapBackground (data, path, showMapCentroids, circlesData) {
     .attr('d', path)
     .attr('fill', '#c2c1b4')
     .style('stroke', 'white')
-
+    
+    // Triggers provinces pie charts appearance
     data.features.forEach((d) => {
         showMapCentroids(d, path, circlesData)
     })
@@ -139,18 +140,42 @@ export function getPath (projection) {
     .projection(projection)
 }
 
-export function mapMarkers(data) {
-    d3.select('#marker-g')
-        .selectAll('circle')
-        .data(data.items)
-        .enter()
-        .append('circle')
-        .style('fill', () => { return 'black' })
-        .style('stroke', () => { return 'red' })
-        .attr('cx', (d) => { return d.x })
-        .attr('cy', (d) => { return d.y })
-        .attr('r', 2)
-        .attr('class', 'marker')
+export function mapMarkers(data, circlesData) {
+    const sizeScale = setCitRadiusScale()
+
+    circlesData.provinces.forEach(prov => {
+        prov.villes.forEach((cit, key) => {
+            let city = data.items.find(obj => obj.name.toUpperCase().normalize("NFD").replace(/\p{Diacritic}/gu, "") === key)
+
+            if (city !== undefined) {
+                let pie = d3.pie().value(dat => dat)
+                const totalMovies = cit.nbFrancais + cit.nbAnglais
+
+                d3.select('#marker-g')
+                    .selectAll('idkWhyButYouNeedMe')
+                    .data(pie([cit.nbFrancais, cit.nbAnglais]))
+                    .enter()
+                    .append('path')
+                    .attr('d', d3.arc().innerRadius(0).outerRadius(sizeScale(totalMovies)))
+                    .attr('fill', (d) => d.data === cit.nbFrancais ? "blue" : "red")
+                    .attr('stroke', 'black')
+                    .attr('transform', `translate(${city.x}, ${city.y})`)
+                    .attr('class', 'provincePieChart')
+                }
+            })
+    })
+
+    // d3.select('#marker-g')
+    //     .selectAll('circle')
+    //     .data(data.items)
+    //     .enter()
+    //     .append('circle')
+    //     .style('fill', () => { return 'black' })
+    //     .style('stroke', () => { return 'red' })
+    //     .attr('cx', (d) => { return d.x })
+    //     .attr('cy', (d) => { return d.y })
+    //     .attr('r', 2)
+    //     .attr('class', 'marker')
 }
 
 export function showMapCentroids (d, path, circlesData) {
@@ -162,7 +187,7 @@ export function showMapCentroids (d, path, circlesData) {
         d.properties.name === "Nunavut" ? y + 300 :
         y
     
-    const sizeScale = setRadiusScale(circlesData)
+    const sizeScale = setProvRadiusScale()
     const totalMovies = province.nbFrancaisTot + province.nbAnglaisTot
     
     d3.select('#map-g')
@@ -174,15 +199,31 @@ export function showMapCentroids (d, path, circlesData) {
         .attr('fill', (d) => d.data === province.nbFrancaisTot ? "blue" : "red")
         .attr('stroke', 'black')
         .attr('transform', `translate(${x}, ${adjustedY})`)
+        .attr('class', 'provincePieChart')
 }
 
-export function setRadiusScale(circlesData) {
-    let maxCombinedLanguages = 0
+export function setProvRadiusScale() {
+    let maxCombinedLanguages = 4436
 
-    circlesData.provinces.forEach(val => {
-        if ((val.nbFrancaisTot + val.nbAnglaisTot) > maxCombinedLanguages)
-            maxCombinedLanguages = val.nbFrancaisTot + val.nbAnglaisTot    
-    })
+    // Was used to fund maxCombinedLanguages, now hardcoded
+    // circlesData.provinces.forEach(val => {
+    //     if ((val.nbFrancaisTot + val.nbAnglaisTot) > maxCombinedLanguages)
+    //         maxCombinedLanguages = val.nbFrancaisTot + val.nbAnglaisTot    
+    // })
 
     return d3.scaleSqrt().domain([0, maxCombinedLanguages]).range([10, 35])
+}
+
+export function setCitRadiusScale() {
+    let maxCombinedLanguages = 3534;
+
+//     Was used to fund maxCombinedLanguages, now hardcoded
+//     circlesData.provinces.forEach(prov => {
+//         prov.villes.forEach((cit, key) => { 
+//             if ((cit.nbFrancais + cit.nbAnglais) > maxCombinedLanguages)
+//                 maxCombinedLanguages = cit.nbFrancais + cit.nbAnglais
+//         })
+//     })
+
+    return d3.scaleSqrt().domain([0, maxCombinedLanguages]).range([2, 8])
 }

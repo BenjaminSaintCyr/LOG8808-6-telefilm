@@ -82,14 +82,20 @@ export function getLanguagePieChartData(data) {
 
 export function convertCoordinates(data, projection, telefilmData) {
     // Only keep cities that are in Telefilm Can data
-    data.items = data.items.filter(items => {
-        return telefilmData.villes.has(items.name.toUpperCase().normalize("NFD").replace(/\p{Diacritic}/gu, "")) 
-    })
+    // data.items = data.items.filter(items => {
+    //     const normalizedItemName = items.name.toUpperCase().normalize("NFD").replace(/\p{Diacritic}/gu, "") 
+    //     return Array.from(telefilmData.provinces.values()).some( val => { 
+    //         val.villes.has(normalizedItemName) 
+    //     })
+    // })
 
     data.items.forEach(items => {
-        if (telefilmData.villes.has(items.name.toUpperCase().normalize("NFD").replace(/\p{Diacritic}/gu, ""))) {
-            items.x = projection(items.position.coordinates)[0]
-            items.y = projection(items.position.coordinates)[1]
-        } 
+        telefilmData.provinces.forEach(d => {
+            if (d.villes.has(items.name.toUpperCase().normalize("NFD").replace(/\p{Diacritic}/gu, ""))) {
+                items.x = projection(items.position.coordinates)[0]
+                items.y = projection(items.position.coordinates)[1]
+            }
+        })
+         
     })
 }

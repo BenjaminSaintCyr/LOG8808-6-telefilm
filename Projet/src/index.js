@@ -30,13 +30,11 @@ import * as graphs from './scripts/graphs.js'
       graphs.mapBackground(data, path, graphs.showMapCentroids, circlesData)
     })    
 
+    // TODO: Uncomment to see cities markers
     // d3.json('./CanadianCities.json').then(function (data) {
     //   preprocess.convertCoordinates(data, projection, circlesData)
-    //   graphs.mapMarkers(data)
+    //   graphs.mapMarkers(data, circlesData)
     // }) 
-
-    // d3.json('./canadaTerr.geojson').then(function (data) {
-    //   graphs.mapBackground(data, path)
-    // })
+    
   }
 })(d3)
