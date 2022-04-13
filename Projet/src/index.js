@@ -20,20 +20,20 @@ import * as graphs from './scripts/graphs.js'
 
     let path = graphs.getPath(projection)
 
-    d3.json('./CanadianProvinces.geojson').then(function (data) {
-      graphs.mapBackground(data, path)
-    })
-
     d3.csv('./telefilm.csv').then(function (data) {
       // let chartData = preprocess.getLanguageLineChartData(data)
       // graphs.multiLineChart(chartData, 1000, 500)
       circlesData = preprocess.getLanguagePieChartData(data)
     })
 
-    d3.json('./CanadianCities.json').then(function (data) {
-      preprocess.convertCoordinates(data, projection, circlesData)
-      graphs.mapMarkers(data)
-    }) 
+    d3.json('./CanadianProvinces.geojson').then(function (data) {
+      graphs.mapBackground(data, path, graphs.showMapCentroids, circlesData)
+    })    
+
+    // d3.json('./CanadianCities.json').then(function (data) {
+    //   preprocess.convertCoordinates(data, projection, circlesData)
+    //   graphs.mapMarkers(data)
+    // }) 
 
     // d3.json('./canadaTerr.geojson').then(function (data) {
     //   graphs.mapBackground(data, path)

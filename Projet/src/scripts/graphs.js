@@ -112,7 +112,7 @@ export function generateMarkerG(width, height) {
     .attr('height', height)
 }
 
-export function mapBackground (data, path) {
+export function mapBackground (data, path, showMapCentroids, circlesData) {
   d3.select('#map-g')
     .selectAll('path')
     .data(data.features)
@@ -121,12 +121,17 @@ export function mapBackground (data, path) {
     .attr('d', path)
     .attr('fill', '#c2c1b4')
     .style('stroke', 'white')
+
+    data.features.forEach((d, i) => {
+        showMapCentroids(d, i, path, circlesData)
+    })
+
 }
 
 export function getProjection () {
   return d3.geoMercator()
-    .center([-106.346771, 60.130366])
-    .scale(700)
+    .center([-106.346771, 66.130366])
+    .scale(600)
 }
 
 export function getPath (projection) {
@@ -145,4 +150,39 @@ export function mapMarkers(data) {
         .attr('cx', (d) => { return d.x })
         .attr('cy', (d) => { return d.y })
         .attr('r', 2)
+        .attr('class', 'marker')
+}
+
+export function showMapCentroids (d, i, path, circlesData) {
+    let pie = d3.pie().value(dat => dat)
+    const province = circlesData.provinces.get(d.properties.name)
+    const [x, y] = path.centroid(d)
+    const adjustedY = 
+        d.properties.name === "Territoires Nord-Ouest" ? y + 125 :
+        d.properties.name === "Nunavut" ? y + 300 :
+        y
+    
+    const sizeScale = setRadiusScale(circlesData)
+    const totalMovies = province.nbFrancaisTot + province.nbAnglaisTot
+    
+    d3.select('#map-g')
+        .selectAll('idkWhyButYouNeedMe')
+        .data(pie([province.nbFrancaisTot, province.nbAnglaisTot]))
+        .enter()
+        .append('path')
+        .attr('d', d3.arc().innerRadius(0).outerRadius(sizeScale(totalMovies)))
+        .attr('fill', (d) => d.data === province.nbFrancaisTot ? "blue" : "red")
+        .attr('stroke', 'black')
+        .attr('transform', `translate(${x}, ${adjustedY})`)
+}
+
+export function setRadiusScale(circlesData) {
+    let maxCombinedLanguages = 0
+
+    circlesData.provinces.forEach(val => {
+        if ((val.nbFrancaisTot + val.nbAnglaisTot) > maxCombinedLanguages)
+            maxCombinedLanguages = val.nbFrancaisTot + val.nbAnglaisTot    
+    })
+
+    return d3.scaleSqrt().domain([0, maxCombinedLanguages]).range([10, 35])
 }
