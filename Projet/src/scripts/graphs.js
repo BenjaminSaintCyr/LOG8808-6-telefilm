@@ -138,7 +138,7 @@ export function generateMarkerG(width, height) {
     .attr('height', height)
 }
 
-export function mapBackground (data, path, showMapCentroids, circlesData) {
+export function mapBackground (data, path, circlesData) {
   d3.select('#map-g')
     .selectAll('path')
     .data(data.features)
@@ -199,6 +199,7 @@ export function showMapCentroids (d, path, circlesData) {
     const adjustedY = 
         d.properties.name === "Territoires Nord-Ouest" ? y + 125 :
         d.properties.name === "Nunavut" ? y + 300 :
+        d.properties.name === "Île-du-Prince-Édouard" ? y - 13 :
         y
     
     const sizeScale = setProvRadiusScale()

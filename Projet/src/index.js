@@ -34,7 +34,7 @@ import * as map from './scripts/map.js'
 
     // Draw map (Marc-Andre)
     d3.json('./CanadianProvinces.geojson').then(function (data) {
-      graphs.mapBackground(data, path, graphs.showMapCentroids, circlesData)
+      graphs.mapBackground(data, path, circlesData)
     })
 
     // Draw cities markers
