@@ -4,7 +4,7 @@ import * as map from './scripts/map.js'
 
 (function (d3) {
   const svgSize = {
-    width: 1500,
+    width: 1300,
     height: 1250
   }
   let projection = graphs.getProjection()

@@ -157,7 +157,7 @@ export function mapBackground (data, path, showMapCentroids, circlesData) {
 
 export function getProjection () {
   return d3.geoMercator()
-    .center([-106.346771, 80.130366])
+    .center([-106.346771, 62.130366])
     .scale(600)
 }
 
