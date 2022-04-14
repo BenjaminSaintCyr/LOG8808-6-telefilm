@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "parcel ./src/index.html --log-level=2 --port=8080"
+    "start": "parcel ./src/index.html --log-level=2 --port=8080",
+    "build": "parcel build --no-minify ./src/index.html"
   },
   "author": "",
   "license": "MIT",
