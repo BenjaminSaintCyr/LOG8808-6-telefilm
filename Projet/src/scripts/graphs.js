@@ -25,8 +25,6 @@ export function multiLineChart(data, width, height, category, province) {
 
     console.log(groupedData)
 
-    let groups = groupedData.map(function(d){ return d.key })
-
     let stackedData = d3.stack()
         .keys(possibleCategoryValues)
         .value(function(d, key){
