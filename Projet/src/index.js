@@ -4,8 +4,8 @@ import * as map from './scripts/map.js'
 
 (function (d3) {
   const svgSize = {
-    width: 1300,
-    height: 1250
+    width: 920,
+    height: 605
   }
   let projection = graphs.getProjection()
   let path = graphs.getPath(projection)
