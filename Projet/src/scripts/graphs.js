@@ -57,9 +57,10 @@ export function multiLineChart(data, width, height, category, province) {
         province === 'Ontario' ||
         province === 'Île-du-Prince-Édouard' ? 
             'l\'' + province : 'le ' + (province || 'Canada')
+
     svg.append("text")
         .text(`Nombre de ${category} pour ${pronvinceName}`)
-        .attr("transform", `translate(${width/2 - 300}, 0)`)
+        .attr("transform", `translate(${width/2 - 300}, 5)`)
 
     let xScale = d3.scalePoint().domain(possibleXValues).range([0, width - 300])
 
