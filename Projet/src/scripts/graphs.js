@@ -138,7 +138,7 @@ export function generateMarkerG(width, height) {
     .attr('height', height)
 }
 
-export function mapBackground (data, path, circlesData) {
+export function mapBackground (data, path, circlesData, onProvinceSelect) {
   d3.select('#map-g')
     .selectAll('path')
     .data(data.features)
@@ -147,6 +147,7 @@ export function mapBackground (data, path, circlesData) {
     .attr('d', path)
     .attr('fill', '#c2c1b4')
     .style('stroke', 'white')
+    .on('click', function (d, i) { onProvinceSelect(d.properties.name) })
     
     // Triggers provinces pie charts appearance
     data.features.forEach((d) => {
