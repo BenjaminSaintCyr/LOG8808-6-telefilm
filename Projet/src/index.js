@@ -6,18 +6,8 @@ import * as map from './scripts/map.js'
   // Draw chart
   d3.csv('./telefilm.csv').then(function(data) {
     console.log(data)
-    let chartData = preprocess.getAreaChartData(data, 'genre')
-    graphs.multiLineChart(chartData, 1000, 500, 'genre')
-
-    document.getElementById("langueButton").addEventListener("click", function() {
-      let chartData = preprocess.getAreaChartData(data, 'langue')
-      graphs.multiLineChart(chartData, 1000, 500, 'langue')
-    })
-
-    document.getElementById("genreButton").addEventListener("click", function() {
-      let chartData = preprocess.getAreaChartData(data, 'genre')
-      graphs.multiLineChart(chartData, 1000, 500, 'genre')
-    })
+    let chartData = preprocess.getLanguageLineChartData(data)
+    graphs.multiLineChart(chartData, 1000, 500)
   })
 
   // Draw map

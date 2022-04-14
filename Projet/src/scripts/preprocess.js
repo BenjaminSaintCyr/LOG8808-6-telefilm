@@ -1,4 +1,4 @@
-export function getAreaChartData(data, category, province='None') {
+export function getLanguageLineChartData(data, province='None') {
     let newData = []
 
     let periods = [
@@ -15,60 +15,30 @@ export function getAreaChartData(data, category, province='None') {
         '2020-2021', 
         '2021-2022'
     ]
-
-    let categoryValues = data.map(elem => {
-        return elem[category]
-    })
-    let categoryVals = categoryValues.filter(function(item, pos) {
-        return categoryValues.indexOf(item) == pos
-    })
-    if(category == 'langue') {
-        categoryVals = [
-            'Français',
-            'Anglais'
-        ]
-    } else if(category == 'genre') {
-        categoryVals = [
-            'Comédie',
-            'Drame',
-            'Référence',
-            'Drame historique',
-            'Documentaire',
-            'Action/Aventure',
-            '0',
-            'Ludo-Éducatif',
-            'Horreur/Suspense',
-            'Comédie romantique',
-            'Western',
-            'Mystère/Crime/Police',
-            'Film musical',
-            'Science-fiction/Film fantastique/Conte',
-            'Enfants',
-            'Jeux',
-            'Divertissement',
-            'Animation'
-        ]
-    }
+    let languages = [
+        'Français',
+        'Anglais'
+    ]
 
     if (province != 'None') {
         data = data.filter(elem => {
-            return elem.province == province
+            return elem.Province == province
         })
     }
     periods.forEach(period => {
-        categoryVals.forEach(categoryVal => {
-            newData.push({"periode": period, [category]: categoryVal, "valeurf": 0})
+        languages.forEach(language => {
+            newData.push({"periode": period, "langue": language, "valeurf": 0})
         })
     })
 
     console.log(newData)
     newData.forEach(mark => {
         data.forEach(elem => {
-            // console.log(elem[category] + mark[category])
-            if (elem.periode == mark.periode && elem[category] == mark[category]) {
+            if (elem.periode == mark.periode && elem.langue == mark.langue) {
                 mark.valeurf += parseFloat(elem.valeurf)
             }
         })
     })
+
     return newData
 }
