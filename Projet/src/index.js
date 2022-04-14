@@ -16,7 +16,7 @@ import * as map from './scripts/map.js'
   
     // Draw chart
   d3.csv('./telefilm.csv').then(function(data) {
-    const [width, height] = [1000, 500]
+    const [width, height] = [900, 500]
 
     let chartData = preprocess.getAreaChartData(data, 'genre')
     graphs.multiLineChart(chartData, width, height, 'genre')
