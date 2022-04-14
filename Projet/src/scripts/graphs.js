@@ -113,3 +113,113 @@ export function multiLineChart(data, width, height, category) {
         .attr("text-anchor", "left")
         .style("alignment-baseline", "middle")
 }
+
+export function setCanvasSize(width, height) {
+    d3.select('#map').select('svg')
+        .attr('width', width)
+        .attr('height', height)
+}
+
+export function generateMapG (width, height) {
+  return d3.select('.graph')
+    .select('svg')
+    .append('g')
+    .attr('id', 'map-g')
+    .attr('width', width)
+    .attr('height', height)
+}
+
+export function generateMarkerG(width, height) {
+ return d3.select('.graph')
+    .select('svg')
+    .append('g')
+    .attr('id', 'marker-g')
+    .attr('width', width)
+    .attr('height', height)
+}
+
+export function mapBackground (data, path, showMapCentroids, circlesData) {
+  d3.select('#map-g')
+    .selectAll('path')
+    .data(data.features)
+    .enter()
+    .append('path')
+    .attr('d', path)
+    .attr('fill', '#c2c1b4')
+    .style('stroke', 'white')
+    
+    // Triggers provinces pie charts appearance
+    data.features.forEach((d) => {
+        showMapCentroids(d, path, circlesData)
+    })
+
+}
+
+export function getProjection () {
+  return d3.geoMercator()
+    .center([-106.346771, 66.130366])
+    .scale(600)
+}
+
+export function getPath (projection) {
+  return d3.geoPath()
+    .projection(projection)
+}
+
+export function mapMarkers(data, circlesData) {
+    const sizeScale = setCitRadiusScale()
+
+    circlesData.provinces.forEach(prov => {
+        prov.villes.forEach((cit, key) => {
+            let city = data.items.find(obj => obj.name.toUpperCase().normalize("NFD").replace(/\p{Diacritic}/gu, "") === key)
+
+            if (city !== undefined) {
+                let pie = d3.pie().value(dat => dat)
+                const totalMovies = cit.nbFrancais + cit.nbAnglais
+
+                d3.select('#marker-g')
+                    .selectAll('idkWhyButYouNeedMe')
+                    .data(pie([cit.nbFrancais, cit.nbAnglais]))
+                    .enter()
+                    .append('path')
+                    .attr('d', d3.arc().innerRadius(0).outerRadius(sizeScale(totalMovies)))
+                    .attr('fill', (d) => d.data === cit.nbFrancais ? "blue" : "red")
+                    .attr('stroke', 'black')
+                    .attr('transform', `translate(${city.x}, ${city.y})`)
+                    .attr('class', 'provincePieChart')
+                }
+            })
+    })
+}
+
+export function showMapCentroids (d, path, circlesData) {
+    let pie = d3.pie().value(dat => dat)
+    const province = circlesData.provinces.get(d.properties.name)
+    const [x, y] = path.centroid(d)
+    const adjustedY = 
+        d.properties.name === "Territoires Nord-Ouest" ? y + 125 :
+        d.properties.name === "Nunavut" ? y + 300 :
+        y
+    
+    const sizeScale = setProvRadiusScale()
+    const totalMovies = province.nbFrancaisTot + province.nbAnglaisTot
+    
+    d3.select('#map-g')
+        .selectAll('idkWhyButYouNeedMe')
+        .data(pie([province.nbFrancaisTot, province.nbAnglaisTot]))
+        .enter()
+        .append('path')
+        .attr('d', d3.arc().innerRadius(0).outerRadius(sizeScale(totalMovies)))
+        .attr('fill', (d) => d.data === province.nbFrancaisTot ? "blue" : "red")
+        .attr('stroke', 'black')
+        .attr('transform', `translate(${x}, ${adjustedY})`)
+        .attr('class', 'provincePieChart')
+}
+
+export function setProvRadiusScale() {
+    return d3.scaleSqrt().domain([0, 4436]).range([10, 35])
+}
+
+export function setCitRadiusScale() {
+    return d3.scaleSqrt().domain([0, 3534]).range([2, 8])
+}

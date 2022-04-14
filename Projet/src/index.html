@@ -1,25 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>D3 Page Template</title>
-    <!-- <script type="module" src="d3.js"></script> -->
-    <link rel="stylesheet" href="assets/style.css">
-  </head>
-  <body>
-    <main>
-      <div class="dropdown">
-        <button class="dropbtn">Catégorie</button>
-        <div class="dropdown-content">
-          <a href="#" id="langueButton">Langue</a>
-          <a href="#" id="genreButton">Genre</a>
-        </div>
-      </div> 
-      <div id="viz-container">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="Description" content="Code pour le projet de INF8808.">
+  <title>Projet | INF8808</title>
+
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+
+<body>
+  <main>
+    <div class="dropdown">
+      <button class="dropbtn">Catégorie</button>
+      <div class="dropdown-content">
+        <a href="#" id="langueButton">Langue</a>
+        <a href="#" id="genreButton">Genre</a>
       </div>
-    </main>
-    <script src="https://d3js.org/d3.v5.js"></script>
-    <script src="https://d3js.org/d3-array.v2.min.js"></script>
-    <script type="text/javascript" src="index.js"></script>
-  </body>
+    </div>
+    <div id="viz-container">
+    </div>
+    <div id="viz-container2">
+      <div class="graph" id="map">
+        <svg class="main-svg"></svg>
+      </div>
+    </div>
+  </main>
+  <script src="https://d3js.org/d3.v5.js"></script>
+  <script src="https://d3js.org/d3-array.v2.min.js"></script>
+  <script type="text/javascript" src="index.js"></script>
+</body>
+
 </html>
