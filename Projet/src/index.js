@@ -32,16 +32,16 @@ import * as map from './scripts/map.js'
 
     let circlesData = preprocess.getLanguagePieChartData(data)
 
-      // Draw map (Marc-Andre)
-      d3.json('./CanadianProvinces.geojson').then(function (data) {
-        graphs.mapBackground(data, path, graphs.showMapCentroids, circlesData)
-      })
+    // Draw map (Marc-Andre)
+    d3.json('./CanadianProvinces.geojson').then(function (data) {
+      graphs.mapBackground(data, path, graphs.showMapCentroids, circlesData)
+    })
 
-      // Draw cities markers
-      d3.json('./CanadianCities.json').then(function (data) {
-        preprocess.convertCoordinates(data, projection, circlesData)
-        graphs.mapMarkers(data, circlesData)
-      })
+    // Draw cities markers
+    d3.json('./CanadianCities.json').then(function (data) {
+      preprocess.convertCoordinates(data, projection, circlesData)
+      graphs.mapMarkers(data, circlesData)
+    })
   })
 
   // Draw map (Louis-Maxime)
