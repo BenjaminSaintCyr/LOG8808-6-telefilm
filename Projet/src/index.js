@@ -23,18 +23,14 @@ import * as map from './scripts/map.js'
 
     document.getElementById("langueButton").addEventListener("click", function() {
       stackData = 'langue'
-      selectedProvince = 'None';
-      graphs.clearAllHighlight();
-      let chartData = preprocess.getAreaChartData(data, 'langue')
-      graphs.multiLineChart(chartData, width, height, 'langue')
+      let chartData = preprocess.getAreaChartData(data, 'langue', selectedProvince)
+      graphs.multiLineChart(chartData, width, height, 'langue', selectedProvince)
     })
 
     document.getElementById("genreButton").addEventListener("click", function() {
       stackData = 'genre'
-      selectedProvince = 'None';
-      graphs.clearAllHighlight();
-      let chartData = preprocess.getAreaChartData(data, 'genre')
-      graphs.multiLineChart(chartData, width, height, 'genre')
+      let chartData = preprocess.getAreaChartData(data, 'genre', selectedProvince)
+      graphs.multiLineChart(chartData, width, height, 'genre', selectedProvince)
     })
 
     let circlesData = preprocess.getLanguagePieChartData(data)
@@ -44,6 +40,13 @@ import * as map from './scripts/map.js'
       const chartData = preprocess.getAreaChartData(data, stackData, province)
       graphs.multiLineChart(chartData, width, height, stackData, province)
     }
+
+    document.getElementById("unselectAll").addEventListener("click", function() {
+      selectedProvince = 'None';
+      graphs.clearAllHighlight();
+      let chartData = preprocess.getAreaChartData(data, stackData, selectedProvince)
+      graphs.multiLineChart(chartData, width, height, stackData)
+    })
 
     // Draw map (Marc-Andre)
     d3.json('./CanadianProvinces.geojson').then(function (data) {
