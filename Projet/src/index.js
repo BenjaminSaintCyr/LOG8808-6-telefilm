@@ -21,15 +21,15 @@ import * as map from './scripts/map.js'
   })
 
   // Draw map (Louis-Maxime)
-  var projection = d3.geoMercator()
-  var path = d3.geoPath().projection(projection)
-  d3.json("./canada.json", function(json) { 
-    map.drawMap(1000, 600, json.features, path)
-  })
+  // var projection = d3.geoMercator()
+  // var path = d3.geoPath().projection(projection)
+  // d3.json("./canada.json", function(json) { 
+  //   map.drawMap(1000, 600, json.features, path)
+  // })
 
   // Pie charts logic to integrate
 
-  /* const svgSize = {
+  const svgSize = {
     width: 1500,
     height: 1200
   }
@@ -62,5 +62,5 @@ import * as map from './scripts/map.js'
     //   graphs.mapMarkers(data, circlesData)
     // }) 
     
-  }*/
+  }
 })(d3)
