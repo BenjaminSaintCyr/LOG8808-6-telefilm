@@ -147,22 +147,57 @@ export function generateMarkerG(width, height) {
     .attr('height', height)
 }
 
-export function mapBackground (data, path, circlesData, onProvinceSelect) {
-  d3.select('#map-g')
-    .selectAll('path')
+function highlightProvince(d) {
+  d.attr("fill", "#94938a").attr("stroke-width", 2).style("stroke", "black");
+}
+
+function unHihglightProvince(d) {
+  d.attr("fill", "#c2c1b4").attr("stroke-width", 1).style("stroke", "white");
+}
+
+export function clearAllHighlight() {
+  d3.select("#map-g")
+    .selectAll(".province")
+    .attr("fill", function (d) {
+      return selectedProvince === d?.properties?.name ? "#94938a" : "#c2c1b4";
+    })
+    .attr("stroke-width", function (d) {
+      return selectedProvince === d?.properties?.name ? 2 : 1;
+    })
+    .style("stroke", function (d) {
+      return selectedProvince === d?.properties?.name ? "black" : "white";
+    });
+}
+
+export function mapBackground(data, path, circlesData, onProvinceSelect) {
+  d3.select("#map-g")
+    .selectAll("path")
     .data(data.features)
     .enter()
-    .append('path')
-    .attr('d', path)
-    .attr('fill', '#c2c1b4')
-    .style('stroke', 'white')
-    .on('click', function (d, i) { onProvinceSelect(d.properties.name) })
-    
-    // Triggers provinces pie charts appearance
-    data.features.forEach((d) => {
-        showMapCentroids(d, path, circlesData)
+    .append("path")
+    .attr("class", "province")
+    .attr("d", path)
+    .attr("fill", "#c2c1b4")
+    .style("stroke", "white")
+    .on("click", function (d, i) {
+      selectedProvince = d.properties.name;
+      clearAllHighlight();
+      onProvinceSelect(d.properties.name);
+      //   highlightProvince(d3.select(this));
     })
+    .on("mouseover", function (d) {
+      highlightProvince(d3.select(this));
+    })
+    .on("mouseout", function (d) {
+      if (selectedProvince !== d.properties.name) {
+        unHihglightProvince(d3.select(this));
+      }
+    });
 
+  // Triggers provinces pie charts appearance
+  data.features.forEach((d) => {
+    showMapCentroids(d, path, circlesData);
+  });
 }
 
 export function getProjection () {

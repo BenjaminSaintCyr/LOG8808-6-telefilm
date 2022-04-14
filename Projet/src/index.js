@@ -2,8 +2,6 @@ import * as preprocess from './scripts/preprocess.js'
 import * as graphs from './scripts/graphs.js'
 import * as map from './scripts/map.js'
 
-var stackData = 'genre';
-
 (function (d3) {
   const svgSize = {
     width: 920,
@@ -25,12 +23,16 @@ var stackData = 'genre';
 
     document.getElementById("langueButton").addEventListener("click", function() {
       stackData = 'langue'
+      selectedProvince = 'None';
+      clearAllHighlight();
       let chartData = preprocess.getAreaChartData(data, 'langue')
       graphs.multiLineChart(chartData, width, height, 'langue')
     })
 
     document.getElementById("genreButton").addEventListener("click", function() {
       stackData = 'genre'
+      selectedProvince = 'None';
+      clearAllHighlight();
       let chartData = preprocess.getAreaChartData(data, 'genre')
       graphs.multiLineChart(chartData, width, height, 'genre')
     })
