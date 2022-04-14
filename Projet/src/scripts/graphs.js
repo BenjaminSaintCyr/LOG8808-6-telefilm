@@ -1,4 +1,4 @@
-export function multiLineChart(data, width, height, category) {
+export function multiLineChart(data, width, height, category, province) {
     d3.select("#viz-container").selectAll('*').remove()
 
     let xValues = data.map(elem => {
@@ -51,7 +51,15 @@ export function multiLineChart(data, width, height, category) {
         .attr("transform",
         "translate(" + margin.left + "," + margin.top + ")")
 
-    // console.log(possibleXValues)
+    // Add title
+    const pronvinceName =
+        province === 'Alberta' || 
+        province === 'Ontario' ||
+        province === 'Île-du-Prince-Édouard' ? 
+            'l\'' + province : 'le ' + (province || 'Canada')
+    svg.append("text")
+        .text(`Nombre de ${category} pour ${pronvinceName}`)
+        .attr("transform", `translate(${width/2 - 300}, 0)`)
 
     let xScale = d3.scalePoint().domain(possibleXValues).range([0, width - 300])
 

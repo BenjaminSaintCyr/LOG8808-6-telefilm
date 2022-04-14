@@ -24,24 +24,26 @@ var stackData = 'genre';
     graphs.multiLineChart(chartData, width, height, 'genre')
 
     document.getElementById("langueButton").addEventListener("click", function() {
-      let chartData = preprocess.getAreaChartData(data, 'langue')
       stackData = 'langue'
+      let chartData = preprocess.getAreaChartData(data, 'langue')
       graphs.multiLineChart(chartData, width, height, 'langue')
     })
 
     document.getElementById("genreButton").addEventListener("click", function() {
-      let chartData = preprocess.getAreaChartData(data, 'genre')
       stackData = 'genre'
+      let chartData = preprocess.getAreaChartData(data, 'genre')
       graphs.multiLineChart(chartData, width, height, 'genre')
     })
 
     let circlesData = preprocess.getLanguagePieChartData(data)
 
-    // Draw map (Marc-Andre)
+    // Change stacked bar chart depending on the province
     const provinceSelecter = (province) => {
       const chartData = preprocess.getAreaChartData(data, stackData, province)
-      graphs.multiLineChart(chartData, width, height, stackData)
+      graphs.multiLineChart(chartData, width, height, stackData, province)
     }
+
+    // Draw map (Marc-Andre)
     d3.json('./CanadianProvinces.geojson').then(function (data) {
       graphs.mapBackground(data, path, circlesData, provinceSelecter)
     })
