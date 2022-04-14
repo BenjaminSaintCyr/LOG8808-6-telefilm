@@ -56,7 +56,7 @@ export function multiLineChart(data, width, height, category, province) {
         province === 'Alberta' || 
         province === 'Ontario' ||
         province === 'Île-du-Prince-Édouard' ? 
-            'l\'' + province : 'le ' + (province || 'Canada')
+            'l\'' + province : 'le ' + (province === 'None' || province == null ? 'Canada' : province)
 
     svg.append("text")
         .text(`Nombre de ${category} pour ${pronvinceName}`)
