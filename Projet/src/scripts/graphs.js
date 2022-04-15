@@ -1,4 +1,4 @@
-export function multiLineChart(data, width, height, category) {
+export function multiLineChart(data, width, height, category, province) {
     d3.select("#viz-container").selectAll('*').remove()
 
     let xValues = data.map(elem => {
@@ -25,8 +25,6 @@ export function multiLineChart(data, width, height, category) {
 
     console.log(groupedData)
 
-    let groups = groupedData.map(function(d){ return d.key })
-
     let stackedData = d3.stack()
         .keys(possibleCategoryValues)
         .value(function(d, key){
@@ -51,7 +49,12 @@ export function multiLineChart(data, width, height, category) {
         .attr("transform",
         "translate(" + margin.left + "," + margin.top + ")")
 
-    // console.log(possibleXValues)
+    // Add title
+    const provinceName = province != undefined ? province : 'Canada'
+
+    svg.append("text")
+        .text(`Financement par ${category} (${provinceName})`)
+        .attr("transform", `translate(${width/2 - 300}, 5)`)
 
     let xScale = d3.scalePoint().domain(possibleXValues).range([0, width - 300])
 
@@ -62,14 +65,31 @@ export function multiLineChart(data, width, height, category) {
     svg.append("g")
         .attr("transform", "translate(0," + height + ")")
         .call(d3.axisBottom(xScale))
+        .selectAll("text")
+        // .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", "rotate(-15) translate(0, 5)")
 
     svg.append("g")
         // .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisLeft(yScale).ticks(10))
+        .call(d3.axisLeft(yScale).ticks(10).tickFormat(x => {return (x / 1000).toLocaleString()}))
 
+    svg.append("text")
+        .attr("class", "y label")
+        .attr("text-anchor", "end")
+        .attr("y", 6)
+        .attr("dy", ".75em")
+        .attr("transform", "rotate(-90) translate(-150, -65)")
+        .text("Financement (k$)");
+        
     var color = d3.scaleOrdinal()
         .domain(possibleCategoryValues)
-        .range(['#377eb8','#e41a1c','#4daf4a','#984ea3','#ff7f00','#ffff33','#a65628','#f781bf','#999999'])
+        .range(["#1F77B4FF", "#D62728FF", "#2CA02CFF", "#FF7F0EFF", 
+        "#9467BDFF", "#8C564BFF", "#E377C2FF", "#7F7F7FFF", "#BCBD22FF", 
+        "#17BECFFF", "#AEC7E8FF", "#FFBB78FF", "#98DF8AFF", "#FF9896FF", 
+        "#C5B0D5FF", "#C49C94FF", "#F7B6D2FF", "#C7C7C7FF", "#DBDB8DFF", "#9EDAE5FF"])
+
 
     svg.selectAll("mylayers")
         .data(stackedData)
@@ -108,7 +128,15 @@ export function multiLineChart(data, width, height, category) {
         .attr("x", legendX + 20)
         .attr("y", function(d,i){ return legendY - i*20 + 5})
         .text(function(d){ 
-            return d == '0' ? 'Festival' : d 
+            let legendName
+            if(d == '0') {
+                legendName = 'Festival'
+            } else if(d == 'Science-fiction/Film fantastique/Conte') {
+                legendName = 'Sci-fi/Fantastique'
+            } else {
+                legendName = d
+            }
+            return legendName
         })
         .attr("text-anchor", "left")
         .style("alignment-baseline", "middle")
@@ -138,21 +166,57 @@ export function generateMarkerG(width, height) {
     .attr('height', height)
 }
 
-export function mapBackground (data, path, circlesData) {
-  d3.select('#map-g')
-    .selectAll('path')
+function highlightProvince(d) {
+  d.attr("fill", "#94938a").attr("stroke-width", 2).style("stroke", "black");
+}
+
+function unHihglightProvince(d) {
+  d.attr("fill", "#c2c1b4").attr("stroke-width", 1).style("stroke", "white");
+}
+
+export function clearAllHighlight() {
+  d3.select("#map-g")
+    .selectAll(".province")
+    .attr("fill", function (d) {
+      return selectedProvince === d?.properties?.name ? "#94938a" : "#c2c1b4";
+    })
+    .attr("stroke-width", function (d) {
+      return selectedProvince === d?.properties?.name ? 2 : 1;
+    })
+    .style("stroke", function (d) {
+      return selectedProvince === d?.properties?.name ? "black" : "white";
+    });
+}
+
+export function mapBackground(data, path, circlesData, onProvinceSelect) {
+  d3.select("#map-g")
+    .selectAll("path")
     .data(data.features)
     .enter()
-    .append('path')
-    .attr('d', path)
-    .attr('fill', '#c2c1b4')
-    .style('stroke', 'white')
-    
-    // Triggers provinces pie charts appearance
-    data.features.forEach((d) => {
-        showMapCentroids(d, path, circlesData)
+    .append("path")
+    .attr("class", "province")
+    .attr("d", path)
+    .attr("fill", "#c2c1b4")
+    .style("stroke", "white")
+    .on("click", function (d, i) {
+      selectedProvince = d.properties.name;
+      clearAllHighlight();
+      onProvinceSelect(d.properties.name);
+      //   highlightProvince(d3.select(this));
     })
+    .on("mouseover", function (d) {
+      highlightProvince(d3.select(this));
+    })
+    .on("mouseout", function (d) {
+      if (selectedProvince !== d.properties.name) {
+        unHihglightProvince(d3.select(this));
+      }
+    });
 
+  // Triggers provinces pie charts appearance
+  data.features.forEach((d) => {
+    showMapCentroids(d, path, circlesData);
+  });
 }
 
 export function getProjection () {

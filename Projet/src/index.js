@@ -16,25 +16,41 @@ import * as map from './scripts/map.js'
   
     // Draw chart
   d3.csv('./telefilm.csv').then(function(data) {
-    console.log(data)
+    const [width, height] = [900, 500]
+
     let chartData = preprocess.getAreaChartData(data, 'genre')
-    graphs.multiLineChart(chartData, 1000, 500, 'genre')
+    graphs.multiLineChart(chartData, width, height, 'genre')
 
     document.getElementById("langueButton").addEventListener("click", function() {
-      let chartData = preprocess.getAreaChartData(data, 'langue')
-      graphs.multiLineChart(chartData, 1000, 500, 'langue')
+      stackData = 'langue'
+      let chartData = preprocess.getAreaChartData(data, 'langue', selectedProvince)
+      graphs.multiLineChart(chartData, width, height, 'langue', selectedProvince)
     })
 
     document.getElementById("genreButton").addEventListener("click", function() {
-      let chartData = preprocess.getAreaChartData(data, 'genre')
-      graphs.multiLineChart(chartData, 1000, 500, 'genre')
+      stackData = 'genre'
+      let chartData = preprocess.getAreaChartData(data, 'genre', selectedProvince)
+      graphs.multiLineChart(chartData, width, height, 'genre', selectedProvince)
     })
 
     let circlesData = preprocess.getLanguagePieChartData(data)
 
+    // Change stacked bar chart depending on the province
+    const provinceSelecter = (province) => {
+      const chartData = preprocess.getAreaChartData(data, stackData, province)
+      graphs.multiLineChart(chartData, width, height, stackData, province)
+    }
+
+    document.getElementById("unselectAll").addEventListener("click", function() {
+      selectedProvince = 'None';
+      graphs.clearAllHighlight();
+      let chartData = preprocess.getAreaChartData(data, stackData, selectedProvince)
+      graphs.multiLineChart(chartData, width, height, stackData)
+    })
+
     // Draw map (Marc-Andre)
     d3.json('./CanadianProvinces.geojson').then(function (data) {
-      graphs.mapBackground(data, path, circlesData)
+      graphs.mapBackground(data, path, circlesData, provinceSelecter)
     })
 
     // Draw cities markers
