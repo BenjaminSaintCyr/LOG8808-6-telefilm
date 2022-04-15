@@ -95,7 +95,7 @@ export function multiLineChart(data, width, height, category, province) {
             .y1(function(d) { return yScale(d[1]); })
         )
 
-    // Légende
+    // Legend
     const legendX = width - 275
     const legendY = 50 + possibleCategoryValues.length * 20
 
@@ -211,17 +211,15 @@ export function getPath (projection) {
     .projection(projection)
 }
 
-export function mapMarkers(data, circlesData) {
+export function mapMarkers(data, circlesData, tip) {
     const sizeScale = setCitRadiusScale()
 
     circlesData.provinces.forEach(prov => {
         prov.villes.forEach((cit, key) => {
             let city = data.items.find(obj => obj.name.toUpperCase().normalize("NFD").replace(/\p{Diacritic}/gu, "") === key)
-
             if (city !== undefined) {
                 let pie = d3.pie().value(dat => dat)
                 const totalMovies = cit.nbFrancais + cit.nbAnglais
-
                 d3.select('#marker-g')
                     .selectAll('idkWhyButYouNeedMe')
                     .data(pie([cit.nbFrancais, cit.nbAnglais]))
@@ -233,8 +231,16 @@ export function mapMarkers(data, circlesData) {
                     .attr('transform', `translate(${city.x}, ${city.y})`)
                     .attr('class', 'provincePieChart')
                 }
-            })
+        })
     })
+}
+
+export function setCityHoverHandler (data) {
+  console.log('got here')
+
+  d3.selectAll('path')
+    .on('mouseover', tip.show())
+    .on('mouseout', tip.hide())
 }
 
 export function showMapCentroids (d, path, circlesData) {

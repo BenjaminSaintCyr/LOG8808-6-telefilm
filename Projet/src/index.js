@@ -1,15 +1,18 @@
 import * as preprocess from './scripts/preprocess.js'
 import * as graphs from './scripts/graphs.js'
 import * as map from './scripts/map.js'
+import d3Tip from 'd3-tip'
+
 
 (function (d3) {
   const svgSize = {
     width: 920,
     height: 605
   }
+
   let projection = graphs.getProjection()
   let path = graphs.getPath(projection)
-
+  
   graphs.setCanvasSize(svgSize.width, svgSize.height)
   graphs.generateMapG(svgSize.width, svgSize.height)
   graphs.generateMarkerG(svgSize.width, svgSize.height)
@@ -54,14 +57,14 @@ import * as map from './scripts/map.js'
     d3.json('./CanadianCities.json').then(function (data) {
       preprocess.convertCoordinates(data, projection, circlesData)
       graphs.mapMarkers(data, circlesData)
+      var tip = d3Tip()
+        .attr('class', 'd3-tip')
+        .offset([-10, 0])
+        .html(function(data) {
+          return "<strong>" + data.items.name + "</strong>"
+      })
+      d3.select('#marker-g').call(tip)
+      graphs.setCityHoverHandler(data)
     })
-  })
-
-  // Draw map (Louis-Maxime)
-  // var projection = d3.geoMercator()
-  // var path = d3.geoPath().projection(projection)
-  // d3.json("./canada.json", function(json) { 
-  //   map.drawMap(1000, 600, json.features, path)
-  // })
-       
+  })   
 })(d3)
