@@ -214,9 +214,9 @@ export function mapBackground(data, path, circlesData, onProvinceSelect) {
     });
 
   // Triggers provinces pie charts appearance
-  data.features.forEach((d) => {
+  /*data.features.forEach((d) => {
     showMapCentroids(d, path, circlesData);
-  });
+  });*/
 }
 
 export function getProjection () {
