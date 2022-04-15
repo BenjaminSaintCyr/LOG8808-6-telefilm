@@ -249,7 +249,7 @@ export function mapMarkers(data, circlesData, tip) {
                     .attr('fill', (d) => d.data === cit.nbFrancais ? "blue" : "red")
                     .attr('stroke', 'black')
                     .attr('transform', `translate(${city.x}, ${city.y})`)
-                    .attr('class', 'provincePieChart')
+                    .attr('class', 'cityPieChart')
                 g.append('title').text(city.name)
             }
         })
@@ -296,5 +296,5 @@ export function setProvRadiusScale() {
 }
 
 export function setCitRadiusScale() {
-    return d3.scaleSqrt().domain([0, 3534]).range([2, 8])
+    return d3.scaleSqrt().domain([0, 3534]).range([4, 14])
 }
