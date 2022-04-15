@@ -1,6 +1,5 @@
 import * as preprocess from './scripts/preprocess.js'
 import * as graphs from './scripts/graphs.js'
-import * as map from './scripts/map.js'
 import d3Tip from 'd3-tip'
 
 
@@ -60,14 +59,15 @@ import d3Tip from 'd3-tip'
     d3.json('./CanadianCities.json').then(function (data) {
       preprocess.convertCoordinates(data, projection, circlesData)
       graphs.mapMarkers(data, circlesData)
-      var tip = d3Tip()
-        .attr('class', 'd3-tip')
-        .offset([-10, 0])
-        .html(function(data) {
-          return "<strong>" + data.items.name + "</strong>"
-      })
-      d3.select('#marker-g').call(tip)
-      graphs.setCityHoverHandler(data)
+      /*var tip = d3Tip().attr('class', 'd3-tip').html("<strong> ok </strong>")
+      let svg = d3.select('#marker-g')
+      svg.call(tip)
+      console.log(d3.select('path').attributes)
+      d3.selectAll('path')
+        .on('mouseover', tip.show().attr('transform', function(d) {
+          return d3.select(this).attr('transform')
+        }))
+        .on('mouseout', tip.hide())*/
     })
   })   
 })(d3)

@@ -239,28 +239,32 @@ export function mapMarkers(data, circlesData, tip) {
             if (city !== undefined) {
                 let pie = d3.pie().value(dat => dat)
                 const totalMovies = cit.nbFrancais + cit.nbAnglais
-                d3.select('#marker-g')
+                console.log(city.name)
+                var g = d3.select('#marker-g')
                     .selectAll('idkWhyButYouNeedMe')
                     .data(pie([cit.nbFrancais, cit.nbAnglais]))
-                    .enter()
-                    .append('path')
+                    .enter().append('g')
+                g.append('path')
                     .attr('d', d3.arc().innerRadius(0).outerRadius(sizeScale(totalMovies)))
                     .attr('fill', (d) => d.data === cit.nbFrancais ? "blue" : "red")
                     .attr('stroke', 'black')
                     .attr('transform', `translate(${city.x}, ${city.y})`)
                     .attr('class', 'provincePieChart')
-                }
+                g.append('title').text(city.name)
+            }
         })
     })
 }
 
-export function setCityHoverHandler (data) {
+/*export function setCityHoverHandler (data) {
   console.log('got here')
 
   d3.selectAll('path')
-    .on('mouseover', tip.show())
+    let position = d3.select(this).attr('transform')
+    console.log(position)
+    .on('mouseover', tip.show().attr('transform', 'translate('))
     .on('mouseout', tip.hide())
-}
+}*/
 
 export function showMapCentroids (d, path, circlesData) {
     let pie = d3.pie().value(dat => dat)
