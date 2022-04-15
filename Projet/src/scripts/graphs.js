@@ -25,8 +25,6 @@ export function multiLineChart(data, width, height, category, province) {
 
     console.log(groupedData)
 
-    let groups = groupedData.map(function(d){ return d.key })
-
     let stackedData = d3.stack()
         .keys(possibleCategoryValues)
         .value(function(d, key){
@@ -52,14 +50,10 @@ export function multiLineChart(data, width, height, category, province) {
         "translate(" + margin.left + "," + margin.top + ")")
 
     // Add title
-    const pronvinceName =
-        province === 'Alberta' || 
-        province === 'Ontario' ||
-        province === 'Île-du-Prince-Édouard' ? 
-            'l\'' + province : 'le ' + (province || 'Canada')
+    const provinceName = province != undefined ? province : 'Canada'
 
     svg.append("text")
-        .text(`Nombre de ${category} pour ${pronvinceName}`)
+        .text(`Financement par ${category} (${provinceName})`)
         .attr("transform", `translate(${width/2 - 300}, 5)`)
 
     let xScale = d3.scalePoint().domain(possibleXValues).range([0, width - 300])
@@ -71,14 +65,31 @@ export function multiLineChart(data, width, height, category, province) {
     svg.append("g")
         .attr("transform", "translate(0," + height + ")")
         .call(d3.axisBottom(xScale))
+        .selectAll("text")
+        // .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", "rotate(-15) translate(0, 5)")
 
     svg.append("g")
         // .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisLeft(yScale).ticks(10))
+        .call(d3.axisLeft(yScale).ticks(10).tickFormat(x => {return (x / 1000).toLocaleString()}))
 
+    svg.append("text")
+        .attr("class", "y label")
+        .attr("text-anchor", "end")
+        .attr("y", 6)
+        .attr("dy", ".75em")
+        .attr("transform", "rotate(-90) translate(-150, -65)")
+        .text("Financement (k$)");
+        
     var color = d3.scaleOrdinal()
         .domain(possibleCategoryValues)
-        .range(['#377eb8','#e41a1c','#4daf4a','#984ea3','#ff7f00','#ffff33','#a65628','#f781bf','#999999'])
+        .range(["#1F77B4FF", "#D62728FF", "#2CA02CFF", "#FF7F0EFF", 
+        "#9467BDFF", "#8C564BFF", "#E377C2FF", "#7F7F7FFF", "#BCBD22FF", 
+        "#17BECFFF", "#AEC7E8FF", "#FFBB78FF", "#98DF8AFF", "#FF9896FF", 
+        "#C5B0D5FF", "#C49C94FF", "#F7B6D2FF", "#C7C7C7FF", "#DBDB8DFF", "#9EDAE5FF"])
+
 
     svg.selectAll("mylayers")
         .data(stackedData)
@@ -117,7 +128,15 @@ export function multiLineChart(data, width, height, category, province) {
         .attr("x", legendX + 20)
         .attr("y", function(d,i){ return legendY - i*20 + 5})
         .text(function(d){ 
-            return d == '0' ? 'Festival' : d 
+            let legendName
+            if(d == '0') {
+                legendName = 'Festival'
+            } else if(d == 'Science-fiction/Film fantastique/Conte') {
+                legendName = 'Sci-fi/Fantastique'
+            } else {
+                legendName = d
+            }
+            return legendName
         })
         .attr("text-anchor", "left")
         .style("alignment-baseline", "middle")

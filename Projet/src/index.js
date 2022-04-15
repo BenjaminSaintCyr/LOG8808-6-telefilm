@@ -19,25 +19,21 @@ import d3Tip from 'd3-tip'
   
     // Draw chart
   d3.csv('./telefilm.csv').then(function(data) {
-    const [width, height] = [1000, 500]
+    const [width, height] = [900, 500]
 
     let chartData = preprocess.getAreaChartData(data, 'genre')
     graphs.multiLineChart(chartData, width, height, 'genre')
 
     document.getElementById("langueButton").addEventListener("click", function() {
       stackData = 'langue'
-      selectedProvince = 'None';
-      graphs.clearAllHighlight();
-      let chartData = preprocess.getAreaChartData(data, 'langue')
-      graphs.multiLineChart(chartData, width, height, 'langue')
+      let chartData = preprocess.getAreaChartData(data, 'langue', selectedProvince)
+      graphs.multiLineChart(chartData, width, height, 'langue', selectedProvince)
     })
 
     document.getElementById("genreButton").addEventListener("click", function() {
       stackData = 'genre'
-      selectedProvince = 'None';
-      graphs.clearAllHighlight();
-      let chartData = preprocess.getAreaChartData(data, 'genre')
-      graphs.multiLineChart(chartData, width, height, 'genre')
+      let chartData = preprocess.getAreaChartData(data, 'genre', selectedProvince)
+      graphs.multiLineChart(chartData, width, height, 'genre', selectedProvince)
     })
 
     let circlesData = preprocess.getLanguagePieChartData(data)
@@ -47,6 +43,13 @@ import d3Tip from 'd3-tip'
       const chartData = preprocess.getAreaChartData(data, stackData, province)
       graphs.multiLineChart(chartData, width, height, stackData, province)
     }
+
+    document.getElementById("unselectAll").addEventListener("click", function() {
+      selectedProvince = 'None';
+      graphs.clearAllHighlight();
+      let chartData = preprocess.getAreaChartData(data, stackData, selectedProvince)
+      graphs.multiLineChart(chartData, width, height, stackData)
+    })
 
     // Draw map (Marc-Andre)
     d3.json('./CanadianProvinces.geojson').then(function (data) {
