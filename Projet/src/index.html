@@ -6,13 +6,15 @@
     <meta name="Description" content="Code pour le projet de INF8808." />
     <title>Projet | INF8808</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/style.css" />
   </head>
 
   <body>
     <h1>Financement par Téléfilm Canada</h1>
     <main>
-      <button id="unselectAll">Déselectionner la région</button>
       <div class="dropdown">
         <button class="dropbtn">Catégorie</button>
         <div class="dropdown-content">
@@ -23,7 +25,9 @@
       </div>
       <div id="viz-full">
         <div id="viz-container2">
+          
           <div class="graph" id="map">
+            <button id="unselectAll">Déselectionner la région</button>
             <svg class="main-svg"></svg>
           </div>
         </div>

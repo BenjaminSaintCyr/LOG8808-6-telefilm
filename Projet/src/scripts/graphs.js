@@ -4,27 +4,23 @@ export function multiLineChart(data, width, height, category, province) {
     let xValues = data.map(elem => {
         return elem.periode
     })
-    let yValues = data.map(elem => {
-        return elem.valeurf
-    })
     let categoryValues = data.map(elem => {
         return elem[category]
     })
+    // Array of all periods, with duplicates removed
     let possibleXValues = xValues.filter(function(item, pos) {
         return xValues.indexOf(item) == pos
     })
+    // Array of all categories, with duplicates removed
     let possibleCategoryValues = categoryValues.filter(function(item, pos) {
         return categoryValues.indexOf(item) == pos
     })
-
-    console.log(possibleCategoryValues)
 
     let groupedData = d3.nest()
         .key(function(d) { return d.periode })
         .entries(data)
 
-    console.log(groupedData)
-
+    // Valeurs préparées pour le stacked area chart (les valeurs des ordonnées sont cumulatives)
     let stackedData = d3.stack()
         .keys(possibleCategoryValues)
         .value(function(d, key){
@@ -32,10 +28,8 @@ export function multiLineChart(data, width, height, category, province) {
         })
         (groupedData)
 
-    console.log(stackedData)
-
     // set the dimensions and margins of the graph
-    let margin = {top: 10, right: 30, bottom: 30, left: 60}
+    let margin = {top: 10, right: 30, bottom: 30, left: 80}
 
     width = width - margin.left - margin.right
     height = height - margin.top - margin.bottom
@@ -49,48 +43,49 @@ export function multiLineChart(data, width, height, category, province) {
         .attr("transform",
         "translate(" + margin.left + "," + margin.top + ")")
 
-    // Add title
-    const provinceName = province != undefined ? province : 'Canada'
-
+    // Add area chart title
+    const provinceName = (province != undefined && province != 'None') ? province : 'Canada'
     svg.append("text")
         .text(`Financement par ${category} (${provinceName})`)
-        .attr("transform", `translate(${width/2 - 300}, 5)`)
+        .attr("transform", `translate(${(width - 300)/2}, 5)`)
+        .attr("class", "areaChartTitle")
 
+    
+    // Set scales
     let xScale = d3.scalePoint().domain(possibleXValues).range([0, width - 300])
-
     let topValues = stackedData[stackedData.length - 1].map(elem => elem[1])
     let maxY = Math.max(...topValues)
     let yScale = d3.scaleLinear().domain([0, maxY]).range([height, 0])
 
+    var color = d3.scaleOrdinal()
+    .domain(possibleCategoryValues)
+    .range(["#1F77B4FF", "#D62728FF", "#2CA02CFF", "#FF7F0EFF", 
+    "#9467BDFF", "#8C564BFF", "#E377C2FF", "#7F7F7FFF", "#BCBD22FF", 
+    "#17BECFFF", "#AEC7E8FF", "#FFBB78FF", "#98DF8AFF", "#FF9896FF", 
+    "#C5B0D5FF", "#C49C94FF", "#F7B6D2FF", "#C7C7C7FF", "#DBDB8DFF", "#9EDAE5FF"])
+
+    // Display axes
     svg.append("g")
         .attr("transform", "translate(0," + height + ")")
         .call(d3.axisBottom(xScale))
         .selectAll("text")
-        // .style("text-anchor", "end")
         .attr("dx", "-.8em")
         .attr("dy", ".15em")
         .attr("transform", "rotate(-15) translate(0, 5)")
-
     svg.append("g")
-        // .attr("transform", "translate(0," + height + ")")
         .call(d3.axisLeft(yScale).ticks(10).tickFormat(x => {return (x / 1000).toLocaleString()}))
 
+    // Display Y axis label
     svg.append("text")
         .attr("class", "y label")
         .attr("text-anchor", "end")
         .attr("y", 6)
         .attr("dy", ".75em")
-        .attr("transform", "rotate(-90) translate(-150, -65)")
-        .text("Financement (k$)");
-        
-    var color = d3.scaleOrdinal()
-        .domain(possibleCategoryValues)
-        .range(["#1F77B4FF", "#D62728FF", "#2CA02CFF", "#FF7F0EFF", 
-        "#9467BDFF", "#8C564BFF", "#E377C2FF", "#7F7F7FFF", "#BCBD22FF", 
-        "#17BECFFF", "#AEC7E8FF", "#FFBB78FF", "#98DF8AFF", "#FF9896FF", 
-        "#C5B0D5FF", "#C49C94FF", "#F7B6D2FF", "#C7C7C7FF", "#DBDB8DFF", "#9EDAE5FF"])
+        .attr("transform", "rotate(-90) translate(-170, -70)")
+        .text("Financement (k$)")
+        .attr("font-size", "14px")
 
-
+    // Draw the graph itself
     svg.selectAll("mylayers")
         .data(stackedData)
         .enter()
@@ -106,7 +101,8 @@ export function multiLineChart(data, width, height, category, province) {
             .y1(function(d) { return yScale(d[1]); })
         )
 
-    // Legend
+    // --- Legend ---
+    
     const legendX = width - 275
     const legendY = 50 + possibleCategoryValues.length * 20
 
@@ -139,6 +135,7 @@ export function multiLineChart(data, width, height, category, province) {
             return legendName
         })
         .attr("text-anchor", "left")
+        .attr("font-size", "12px")
         .style("alignment-baseline", "middle")
 }
 

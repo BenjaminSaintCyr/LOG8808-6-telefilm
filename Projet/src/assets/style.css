@@ -11,6 +11,26 @@ h1 {
   border: none;
 }
 
+#unselectAll {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+}
+
+.graph {
+  position: relative;
+  border-style: solid;
+  border-radius: 5px;
+}
+
+.areaChartTitle {
+  text-anchor: middle;
+}
+
+* {
+  font-family: 'Open Sans', sans-serif;
+}
+
 /* The container <div> - needed to position the dropdown content */
 .dropdown {
   position: relative;
@@ -62,6 +82,8 @@ h1 {
 
 #viz-container {
   flex: 1;
+  display: flex;
+  align-items: center;
 }
 
 #viz-container2 {
