@@ -1,4 +1,5 @@
-export function multiLineChart(data, width, height, category, province) {
+export function stackedAreaChart(data, width, height, category, province) {
+  // Made with the help of https://d3-graph-gallery.com/graph/stackedarea_basic.html
     d3.select("#viz-container").selectAll('*').remove()
 
     let xValues = data.map(elem => {
@@ -20,7 +21,7 @@ export function multiLineChart(data, width, height, category, province) {
         .key(function(d) { return d.periode })
         .entries(data)
 
-    // Valeurs préparées pour le stacked area chart (les valeurs des ordonnées sont cumulatives)
+    // Prepared values for the stacked area chart (Y values are cumulative)
     let stackedData = d3.stack()
         .keys(possibleCategoryValues)
         .value(function(d, key){
@@ -28,13 +29,13 @@ export function multiLineChart(data, width, height, category, province) {
         })
         (groupedData)
 
-    // set the dimensions and margins of the graph
+    // Set the dimensions and margins of the graph
     let margin = {top: 10, right: 30, bottom: 30, left: 80}
 
     width = width - margin.left - margin.right
     height = height - margin.top - margin.bottom
 
-    // append the svg object to the body of the page
+    // Append the svg object to the body of the page
     let svg = d3.select("#viz-container")
         .append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -44,12 +45,7 @@ export function multiLineChart(data, width, height, category, province) {
         "translate(" + margin.left + "," + margin.top + ")")
 
     // Add area chart title
-    const provinceName = (province != undefined && province != 'None') ? province : 'Canada'
-    svg.append("text")
-        .text(`Financement par ${category} (${provinceName})`)
-        .attr("transform", `translate(${(width - 300)/2}, 5)`)
-        .attr("class", "areaChartTitle")
-
+    drawTitle(width, category, province, svg)
     
     // Set scales
     let xScale = d3.scalePoint().domain(possibleXValues).range([0, width - 300])
@@ -65,25 +61,7 @@ export function multiLineChart(data, width, height, category, province) {
     "#C5B0D5FF", "#C49C94FF", "#F7B6D2FF", "#C7C7C7FF", "#DBDB8DFF", "#9EDAE5FF"])
 
     // Display axes
-    svg.append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(xScale))
-        .selectAll("text")
-        .attr("dx", "-.8em")
-        .attr("dy", ".15em")
-        .attr("transform", "rotate(-15) translate(0, 5)")
-    svg.append("g")
-        .call(d3.axisLeft(yScale).ticks(10).tickFormat(x => {return (x / 1000).toLocaleString()}))
-
-    // Display Y axis label
-    svg.append("text")
-        .attr("class", "y label")
-        .attr("text-anchor", "end")
-        .attr("y", 6)
-        .attr("dy", ".75em")
-        .attr("transform", "rotate(-90) translate(-170, -70)")
-        .text("Financement (k$)")
-        .attr("font-size", "14px")
+    drawAxes(xScale, yScale, svg, height)
 
     // Draw the graph itself
     svg.selectAll("mylayers")
@@ -101,42 +79,75 @@ export function multiLineChart(data, width, height, category, province) {
             .y1(function(d) { return yScale(d[1]); })
         )
 
-    // --- Legend ---
-    
-    const legendX = width - 275
-    const legendY = 50 + possibleCategoryValues.length * 20
+    drawLegend(width, possibleCategoryValues, color, svg)
+}
 
-    // Add one dot in the legend for each name.
-    svg.selectAll("mydots")
-        .data(possibleCategoryValues)
-        .enter()
-        .append("circle")
-        .attr("cx", legendX)
-        .attr("cy", function(d,i){ return legendY - i*20})
-        .attr("r", 7)
-        .style("fill", function(d){ return color(d)})
+export function drawTitle(width, category, province, svg) {
+  const provinceName = (province != undefined && province != 'None') ? province : 'Canada'
+  svg.append("text")
+      .text(`Financement par ${category} (${provinceName})`)
+      .attr("transform", `translate(${(width - 300)/2}, 5)`)
+      .attr("class", "areaChartTitle")
+}
 
-    // Add one dot in the legend for each name.
-    svg.selectAll("mylabels")
-        .data(possibleCategoryValues)
-        .enter()
-        .append("text")
-        .attr("x", legendX + 20)
-        .attr("y", function(d,i){ return legendY - i*20 + 5})
-        .text(function(d){ 
-            let legendName
-            if(d == '0') {
-                legendName = 'Festival'
-            } else if(d == 'Science-fiction/Film fantastique/Conte') {
-                legendName = 'Sci-fi/Fantastique'
-            } else {
-                legendName = d
-            }
-            return legendName
-        })
-        .attr("text-anchor", "left")
-        .attr("font-size", "12px")
-        .style("alignment-baseline", "middle")
+export function drawAxes(xScale, yScale, svg, height) {
+  svg.append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(xScale))
+    .selectAll("text")
+    .attr("dx", "-.8em")
+    .attr("dy", ".15em")
+    .attr("transform", "rotate(-15) translate(0, 5)")
+  svg.append("g")
+    .call(d3.axisLeft(yScale).ticks(10).tickFormat(x => {return (x / 1000).toLocaleString()}))
+
+  // Display Y axis label
+  svg.append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("y", 6)
+    .attr("dy", ".75em")
+    .attr("transform", "rotate(-90) translate(-170, -70)")
+    .text("Financement (k$)")
+    .attr("font-size", "14px")
+}
+
+export function drawLegend(chartWidth, possibleCategoryValues, colorScale, svg) {
+  // Made with the help of https://d3-graph-gallery.com/graph/custom_legend.html
+  const legendX = chartWidth - 275
+  const legendY = 50 + possibleCategoryValues.length * 20
+
+  // Add one dot in the legend for each name.
+  svg.selectAll("mydots")
+      .data(possibleCategoryValues)
+      .enter()
+      .append("circle")
+      .attr("cx", legendX)
+      .attr("cy", function(d,i){ return legendY - i*20})
+      .attr("r", 7)
+      .style("fill", function(d){ return colorScale(d)})
+
+  // Add one dot in the legend for each name.
+  svg.selectAll("mylabels")
+      .data(possibleCategoryValues)
+      .enter()
+      .append("text")
+      .attr("x", legendX + 20)
+      .attr("y", function(d,i){ return legendY - i*20 + 5})
+      .text(function(d){ 
+          let legendName
+          if(d == '0') {
+              legendName = 'Festival'
+          } else if(d == 'Science-fiction/Film fantastique/Conte') {
+              legendName = 'Sci-fi/Fantastique'
+          } else {
+              legendName = d
+          }
+          return legendName
+      })
+      .attr("text-anchor", "left")
+      .attr("font-size", "12px")
+      .style("alignment-baseline", "middle")
 }
 
 export function setCanvasSize(width, height) {

@@ -13,7 +13,6 @@ export function getAreaChartData(data, category, province='None') {
         '2017-2018', 
         '2019-2020', 
         '2020-2021', 
-        '2021-2022'
     ]
 
     let categoryValues = data.map(elem => {
