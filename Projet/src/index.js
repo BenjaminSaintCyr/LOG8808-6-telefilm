@@ -50,24 +50,15 @@ import d3Tip from 'd3-tip'
       graphs.multiLineChart(chartData, width, height, stackData)
     })
 
-    // Draw map (Marc-Andre)
+    // Draw map
     d3.json('./CanadianProvinces.geojson').then(function (data) {
-      graphs.mapBackground(data, path, circlesData, provinceSelecter)
+      graphs.mapBackground(data, path, provinceSelecter)
     })
 
     // Draw cities markers
     d3.json('./CanadianCities.json').then(function (data) {
       preprocess.convertCoordinates(data, projection, circlesData)
       graphs.mapMarkers(data, circlesData)
-      /*var tip = d3Tip().attr('class', 'd3-tip').html("<strong> ok </strong>")
-      let svg = d3.select('#marker-g')
-      svg.call(tip)
-      console.log(d3.select('path').attributes)
-      d3.selectAll('path')
-        .on('mouseover', tip.show().attr('transform', function(d) {
-          return d3.select(this).attr('transform')
-        }))
-        .on('mouseout', tip.hide())*/
     })
   })   
 })(d3)
