@@ -13,7 +13,6 @@ export function getAreaChartData(data, category, province='None') {
         '2017-2018', 
         '2019-2020', 
         '2020-2021', 
-        '2021-2022'
     ]
 
     let categoryValues = data.map(elem => {
@@ -64,7 +63,6 @@ export function getAreaChartData(data, category, province='None') {
     console.log(newData)
     newData.forEach(mark => {
         data.forEach(elem => {
-            // console.log(elem[category] + mark[category])
             if (elem.periode == mark.periode && elem[category] == mark[category]) {
                 mark.valeurf += parseFloat(elem.valeurf)
             }
@@ -75,7 +73,6 @@ export function getAreaChartData(data, category, province='None') {
 
 export function getLanguagePieChartData(data) {
     let newData = { "provinces": new Map()}
-    // let newData = { "villes": new Map()}
 
     data = data.filter(element => {
         return element.pays === 'Canada' 
@@ -103,21 +100,12 @@ export function getLanguagePieChartData(data) {
 }
 
 export function convertCoordinates(data, projection, telefilmData) {
-    // Only keep cities that are in Telefilm Can data
-    // data.items = data.items.filter(items => {
-    //     const normalizedItemName = items.name.toUpperCase().normalize("NFD").replace(/\p{Diacritic}/gu, "") 
-    //     return Array.from(telefilmData.provinces.values()).some( val => { 
-    //         val.villes.has(normalizedItemName) 
-    //     })
-    // })
-
     data.items.forEach(items => {
         telefilmData.provinces.forEach(d => {
             if (d.villes.has(items.name.toUpperCase().normalize("NFD").replace(/\p{Diacritic}/gu, ""))) {
                 items.x = projection(items.position.coordinates)[0]
                 items.y = projection(items.position.coordinates)[1]
             }
-        })
-         
+        })   
     })
 }

@@ -1,30 +1,27 @@
-export function multiLineChart(data, width, height, category, province) {
+export function stackedAreaChart(data, width, height, category, province) {
+  // Made with the help of https://d3-graph-gallery.com/graph/stackedarea_basic.html
     d3.select("#viz-container").selectAll('*').remove()
 
     let xValues = data.map(elem => {
         return elem.periode
     })
-    let yValues = data.map(elem => {
-        return elem.valeurf
-    })
     let categoryValues = data.map(elem => {
         return elem[category]
     })
+    // Array of all periods, with duplicates removed
     let possibleXValues = xValues.filter(function(item, pos) {
         return xValues.indexOf(item) == pos
     })
+    // Array of all categories, with duplicates removed
     let possibleCategoryValues = categoryValues.filter(function(item, pos) {
         return categoryValues.indexOf(item) == pos
     })
-
-    console.log(possibleCategoryValues)
 
     let groupedData = d3.nest()
         .key(function(d) { return d.periode })
         .entries(data)
 
-    console.log(groupedData)
-
+    // Prepared values for the stacked area chart (Y values are cumulative)
     let stackedData = d3.stack()
         .keys(possibleCategoryValues)
         .value(function(d, key){
@@ -32,15 +29,13 @@ export function multiLineChart(data, width, height, category, province) {
         })
         (groupedData)
 
-    console.log(stackedData)
-
-    // set the dimensions and margins of the graph
-    let margin = {top: 10, right: 30, bottom: 30, left: 60}
+    // Set the dimensions and margins of the graph
+    let margin = {top: 10, right: 30, bottom: 30, left: 80}
 
     width = width - margin.left - margin.right
     height = height - margin.top - margin.bottom
 
-    // append the svg object to the body of the page
+    // Append the svg object to the body of the page
     let svg = d3.select("#viz-container")
         .append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -49,48 +44,26 @@ export function multiLineChart(data, width, height, category, province) {
         .attr("transform",
         "translate(" + margin.left + "," + margin.top + ")")
 
-    // Add title
-    const provinceName = province != undefined ? province : 'Canada'
-
-    svg.append("text")
-        .text(`Financement par ${category} (${provinceName})`)
-        .attr("transform", `translate(${width/2 - 300}, 5)`)
-
+    // Add area chart title
+    drawTitle(width, category, province, svg)
+    
+    // Set scales
     let xScale = d3.scalePoint().domain(possibleXValues).range([0, width - 300])
-
     let topValues = stackedData[stackedData.length - 1].map(elem => elem[1])
     let maxY = Math.max(...topValues)
     let yScale = d3.scaleLinear().domain([0, maxY]).range([height, 0])
 
-    svg.append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(xScale))
-        .selectAll("text")
-        // .style("text-anchor", "end")
-        .attr("dx", "-.8em")
-        .attr("dy", ".15em")
-        .attr("transform", "rotate(-15) translate(0, 5)")
-
-    svg.append("g")
-        // .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisLeft(yScale).ticks(10).tickFormat(x => {return (x / 1000).toLocaleString()}))
-
-    svg.append("text")
-        .attr("class", "y label")
-        .attr("text-anchor", "end")
-        .attr("y", 6)
-        .attr("dy", ".75em")
-        .attr("transform", "rotate(-90) translate(-150, -65)")
-        .text("Financement (k$)");
-        
     var color = d3.scaleOrdinal()
-        .domain(possibleCategoryValues)
-        .range(["#1F77B4FF", "#D62728FF", "#2CA02CFF", "#FF7F0EFF", 
-        "#9467BDFF", "#8C564BFF", "#E377C2FF", "#7F7F7FFF", "#BCBD22FF", 
-        "#17BECFFF", "#AEC7E8FF", "#FFBB78FF", "#98DF8AFF", "#FF9896FF", 
-        "#C5B0D5FF", "#C49C94FF", "#F7B6D2FF", "#C7C7C7FF", "#DBDB8DFF", "#9EDAE5FF"])
+    .domain(possibleCategoryValues)
+    .range(["#1F77B4FF", "#D62728FF", "#2CA02CFF", "#FF7F0EFF", 
+    "#9467BDFF", "#8C564BFF", "#E377C2FF", "#7F7F7FFF", "#BCBD22FF", 
+    "#17BECFFF", "#AEC7E8FF", "#FFBB78FF", "#98DF8AFF", "#FF9896FF", 
+    "#C5B0D5FF", "#C49C94FF", "#F7B6D2FF", "#C7C7C7FF", "#DBDB8DFF", "#9EDAE5FF"])
 
+    // Display axes
+    drawAxes(xScale, yScale, svg, height)
 
+    // Draw the graph itself
     svg.selectAll("mylayers")
         .data(stackedData)
         .enter()
@@ -106,40 +79,75 @@ export function multiLineChart(data, width, height, category, province) {
             .y1(function(d) { return yScale(d[1]); })
         )
 
-    // Legend
-    const legendX = width - 275
-    const legendY = 50 + possibleCategoryValues.length * 20
+    drawLegend(width, possibleCategoryValues, color, svg)
+}
 
-    // Add one dot in the legend for each name.
-    svg.selectAll("mydots")
-        .data(possibleCategoryValues)
-        .enter()
-        .append("circle")
-        .attr("cx", legendX)
-        .attr("cy", function(d,i){ return legendY - i*20})
-        .attr("r", 7)
-        .style("fill", function(d){ return color(d)})
+export function drawTitle(width, category, province, svg) {
+  const provinceName = (province != undefined && province != 'None') ? province : 'Canada'
+  svg.append("text")
+      .text(`Financement par ${category} (${provinceName})`)
+      .attr("transform", `translate(${(width - 300)/2}, 5)`)
+      .attr("class", "areaChartTitle")
+}
 
-    // Add one dot in the legend for each name.
-    svg.selectAll("mylabels")
-        .data(possibleCategoryValues)
-        .enter()
-        .append("text")
-        .attr("x", legendX + 20)
-        .attr("y", function(d,i){ return legendY - i*20 + 5})
-        .text(function(d){ 
-            let legendName
-            if(d == '0') {
-                legendName = 'Festival'
-            } else if(d == 'Science-fiction/Film fantastique/Conte') {
-                legendName = 'Sci-fi/Fantastique'
-            } else {
-                legendName = d
-            }
-            return legendName
-        })
-        .attr("text-anchor", "left")
-        .style("alignment-baseline", "middle")
+export function drawAxes(xScale, yScale, svg, height) {
+  svg.append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(xScale))
+    .selectAll("text")
+    .attr("dx", "-.8em")
+    .attr("dy", ".15em")
+    .attr("transform", "rotate(-15) translate(0, 5)")
+  svg.append("g")
+    .call(d3.axisLeft(yScale).ticks(10).tickFormat(x => {return (x / 1000).toLocaleString()}))
+
+  // Display Y axis label
+  svg.append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("y", 6)
+    .attr("dy", ".75em")
+    .attr("transform", "rotate(-90) translate(-170, -70)")
+    .text("Financement (k$)")
+    .attr("font-size", "14px")
+}
+
+export function drawLegend(chartWidth, possibleCategoryValues, colorScale, svg) {
+  // Made with the help of https://d3-graph-gallery.com/graph/custom_legend.html
+  const legendX = chartWidth - 275
+  const legendY = 50 + possibleCategoryValues.length * 20
+
+  // Add one dot in the legend for each name.
+  svg.selectAll("mydots")
+      .data(possibleCategoryValues)
+      .enter()
+      .append("circle")
+      .attr("cx", legendX)
+      .attr("cy", function(d,i){ return legendY - i*20})
+      .attr("r", 7)
+      .style("fill", function(d){ return colorScale(d)})
+
+  // Add one dot in the legend for each name.
+  svg.selectAll("mylabels")
+      .data(possibleCategoryValues)
+      .enter()
+      .append("text")
+      .attr("x", legendX + 20)
+      .attr("y", function(d,i){ return legendY - i*20 + 5})
+      .text(function(d){ 
+          let legendName
+          if(d == '0') {
+              legendName = 'Festival'
+          } else if(d == 'Science-fiction/Film fantastique/Conte') {
+              legendName = 'Sci-fi/Fantastique'
+          } else {
+              legendName = d
+          }
+          return legendName
+      })
+      .attr("text-anchor", "left")
+      .attr("font-size", "12px")
+      .style("alignment-baseline", "middle")
 }
 
 export function setCanvasSize(width, height) {
@@ -188,7 +196,7 @@ export function clearAllHighlight() {
     });
 }
 
-export function mapBackground(data, path, circlesData, onProvinceSelect) {
+export function mapBackground(data, path, onProvinceSelect) {
   d3.select("#map-g")
     .selectAll("path")
     .data(data.features)
@@ -202,7 +210,6 @@ export function mapBackground(data, path, circlesData, onProvinceSelect) {
       selectedProvince = d.properties.name;
       clearAllHighlight();
       onProvinceSelect(d.properties.name);
-      //   highlightProvince(d3.select(this));
     })
     .on("mouseover", function (d) {
       highlightProvince(d3.select(this));
@@ -212,11 +219,6 @@ export function mapBackground(data, path, circlesData, onProvinceSelect) {
         unHihglightProvince(d3.select(this));
       }
     });
-
-  // Triggers provinces pie charts appearance
-  /*data.features.forEach((d) => {
-    showMapCentroids(d, path, circlesData);
-  });*/
 }
 
 export function getProjection () {
@@ -230,65 +232,53 @@ export function getPath (projection) {
     .projection(projection)
 }
 
-export function mapMarkers(data, circlesData, tip) {
+export function mapMarkers(data, circlesData) {
     const sizeScale = setCitRadiusScale()
-
+    
+    let tooltip2 = d3.select("body")
+      .append("div")
+      .style("position", "absolute")
+      .style("visibility", "hidden")
+      .style("background-color", "white")
+      .style("border", "solid")
+      .style("border-width", "1px")
+      .style("border-radius", "5px")
+      .style("font-size", "10px")
+      .style("padding", "8px")
+      .style("padding-top", "3px")
+      .style("padding-bottom", "0px")
+  
     circlesData.provinces.forEach(prov => {
         prov.villes.forEach((cit, key) => {
             let city = data.items.find(obj => obj.name.toUpperCase().normalize("NFD").replace(/\p{Diacritic}/gu, "") === key)
             if (city !== undefined) {
                 let pie = d3.pie().value(dat => dat)
                 const totalMovies = cit.nbFrancais + cit.nbAnglais
-                console.log(city.name)
-                var g = d3.select('#marker-g')
-                    .selectAll('idkWhyButYouNeedMe')
-                    .data(pie([cit.nbFrancais, cit.nbAnglais]))
-                    .enter().append('g')
-                g.append('path')
-                    .attr('d', d3.arc().innerRadius(0).outerRadius(sizeScale(totalMovies)))
-                    .attr('fill', (d) => d.data === cit.nbFrancais ? "blue" : "red")
-                    .attr('stroke', 'black')
-                    .attr('transform', `translate(${city.x}, ${city.y})`)
-                    .attr('class', 'cityPieChart')
-                g.append('title').text(city.name)
+                let path = d3.select('#marker-g')
+                  .selectAll('idkWhyButYouNeedMe')
+                  .data(pie([cit.nbFrancais, cit.nbAnglais]))
+                  .enter()
+                  .append('path')
+                
+                path.attr('d', d3.arc().innerRadius(0).outerRadius(sizeScale(totalMovies)))
+                  .attr('fill', (d) => d.data === cit.nbFrancais ? "blue" : "red")
+                  .attr('stroke', 'black')
+                  .attr('transform', `translate(${city.x}, ${city.y})`)
+                  .attr('class', 'cityPieChart')
+                
+              path.on('mouseover', function () {
+                tooltip2.html(
+                  "<strong>" + city.name + "</strong>" +
+                  "<p> Anglais: " + cit.nbAnglais + "</p>" +
+                  "<p> Français: " + cit.nbFrancais + "</p>");
+                return tooltip2.style("visibility", "visible");
+              })
             }
         })
-    })
-}
-
-/*export function setCityHoverHandler (data) {
-  console.log('got here')
-
-  d3.selectAll('path')
-    let position = d3.select(this).attr('transform')
-    console.log(position)
-    .on('mouseover', tip.show().attr('transform', 'translate('))
-    .on('mouseout', tip.hide())
-}*/
-
-export function showMapCentroids (d, path, circlesData) {
-    let pie = d3.pie().value(dat => dat)
-    const province = circlesData.provinces.get(d.properties.name)
-    const [x, y] = path.centroid(d)
-    const adjustedY = 
-        d.properties.name === "Territoires Nord-Ouest" ? y + 125 :
-        d.properties.name === "Nunavut" ? y + 300 :
-        d.properties.name === "Île-du-Prince-Édouard" ? y - 13 :
-        y
-    
-    const sizeScale = setProvRadiusScale()
-    const totalMovies = province.nbFrancaisTot + province.nbAnglaisTot
-    
-    d3.select('#map-g')
-        .selectAll('idkWhyButYouNeedMe')
-        .data(pie([province.nbFrancaisTot, province.nbAnglaisTot]))
-        .enter()
-        .append('path')
-        .attr('d', d3.arc().innerRadius(0).outerRadius(sizeScale(totalMovies)))
-        .attr('fill', (d) => d.data === province.nbFrancaisTot ? "blue" : "red")
-        .attr('stroke', 'black')
-        .attr('transform', `translate(${x}, ${adjustedY})`)
-        .attr('class', 'provincePieChart')
+      })
+    d3.selectAll(".cityPieChart")
+      .on("mousemove", function() {return tooltip2.style("top", (event.pageY)+"px").style("left",(event.pageX)+"px");})
+      .on("mouseout", function() {return tooltip2.style("visibility", "hidden");});
 }
 
 export function setProvRadiusScale() {
