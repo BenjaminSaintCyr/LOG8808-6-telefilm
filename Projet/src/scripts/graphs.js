@@ -1,10 +1,5 @@
-export function updateToolTip(tooltip, cityName) { 
-  tooltip.html("<p>" + cityName + "</p>")
-}
-
 export function stackedAreaChart(data, width, height, category, province) {
-    // Made with the help of https://d3-graph-gallery.com/graph/stackedarea_basic.html
-
+  // Made with the help of https://d3-graph-gallery.com/graph/stackedarea_basic.html
     d3.select("#viz-container").selectAll('*').remove()
 
     let xValues = data.map(elem => {
@@ -201,7 +196,7 @@ export function clearAllHighlight() {
     });
 }
 
-export function mapBackground(data, path, circlesData, onProvinceSelect) {
+export function mapBackground(data, path, onProvinceSelect) {
   d3.select("#map-g")
     .selectAll("path")
     .data(data.features)
@@ -215,7 +210,6 @@ export function mapBackground(data, path, circlesData, onProvinceSelect) {
       selectedProvince = d.properties.name;
       clearAllHighlight();
       onProvinceSelect(d.properties.name);
-      //   highlightProvince(d3.select(this));
     })
     .on("mouseover", function (d) {
       highlightProvince(d3.select(this));
@@ -225,11 +219,6 @@ export function mapBackground(data, path, circlesData, onProvinceSelect) {
         unHihglightProvince(d3.select(this));
       }
     });
-
-  // Triggers provinces pie charts appearance
-  /*data.features.forEach((d) => {
-    showMapCentroids(d, path, circlesData);
-  });*/
 }
 
 export function getProjection () {
@@ -243,21 +232,22 @@ export function getPath (projection) {
     .projection(projection)
 }
 
-export function mapMarkers(data, circlesData, tip) {
+export function mapMarkers(data, circlesData) {
     const sizeScale = setCitRadiusScale()
     
-    let tooltip2 = d3.select("#viz-container")
+    let tooltip2 = d3.select("body")
       .append("div")
       .style("position", "absolute")
       .style("visibility", "hidden")
       .style("background-color", "white")
       .style("border", "solid")
       .style("border-width", "1px")
-    .style("border-radius", "5px")
-  .style("font-size", "10px")
-.style("padding", "10px")
-.style("padding-top", "3px")
-.style("padding-bottom", "1px")
+      .style("border-radius", "5px")
+      .style("font-size", "10px")
+      .style("padding", "8px")
+      .style("padding-top", "3px")
+      .style("padding-bottom", "0px")
+  
     circlesData.provinces.forEach(prov => {
         prov.villes.forEach((cit, key) => {
             let city = data.items.find(obj => obj.name.toUpperCase().normalize("NFD").replace(/\p{Diacritic}/gu, "") === key)
@@ -289,41 +279,6 @@ export function mapMarkers(data, circlesData, tip) {
     d3.selectAll(".cityPieChart")
       .on("mousemove", function() {return tooltip2.style("top", (event.pageY)+"px").style("left",(event.pageX)+"px");})
       .on("mouseout", function() {return tooltip2.style("visibility", "hidden");});
-}
-
-/*export function setCityHoverHandler (data) {
-  console.log('got here')
-
-  d3.selectAll('path')
-    let position = d3.select(this).attr('transform')
-    console.log(position)
-    .on('mouseover', tip.show().attr('transform', 'translate('))
-    .on('mouseout', tip.hide())
-}*/
-
-export function showMapCentroids (d, path, circlesData) {
-    let pie = d3.pie().value(dat => dat)
-    const province = circlesData.provinces.get(d.properties.name)
-    const [x, y] = path.centroid(d)
-    const adjustedY = 
-        d.properties.name === "Territoires Nord-Ouest" ? y + 125 :
-        d.properties.name === "Nunavut" ? y + 300 :
-        d.properties.name === "Île-du-Prince-Édouard" ? y - 13 :
-        y
-    
-    const sizeScale = setProvRadiusScale()
-    const totalMovies = province.nbFrancaisTot + province.nbAnglaisTot
-    
-    d3.select('#map-g')
-        .selectAll('idkWhyButYouNeedMe')
-        .data(pie([province.nbFrancaisTot, province.nbAnglaisTot]))
-        .enter()
-        .append('path')
-        .attr('d', d3.arc().innerRadius(0).outerRadius(sizeScale(totalMovies)))
-        .attr('fill', (d) => d.data === province.nbFrancaisTot ? "blue" : "red")
-        .attr('stroke', 'black')
-        .attr('transform', `translate(${x}, ${adjustedY})`)
-        .attr('class', 'provincePieChart')
 }
 
 export function setProvRadiusScale() {
