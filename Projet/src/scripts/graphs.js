@@ -224,7 +224,7 @@ export function getPath (projection) {
 export function mapMarkers(data, circlesData) {
     const sizeScale = setCitRadiusScale()
     
-    let tooltip2 = d3.select("#viz-container")
+    let tooltip2 = d3.select("body")
       .append("div")
       .style("position", "absolute")
       .style("visibility", "hidden")
