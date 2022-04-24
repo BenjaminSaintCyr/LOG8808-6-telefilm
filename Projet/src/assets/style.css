@@ -89,7 +89,3 @@ h1 {
 #viz-container2 {
   flex: 1;
 }
-
-.cityPieChart {
-  pointer-events: none;
-}

@@ -1,3 +1,7 @@
+export function updateToolTip(tooltip, cityName) { 
+  tooltip.html("<p>" + cityName + "</p>")
+}
+
 export function multiLineChart(data, width, height, category, province) {
     d3.select("#viz-container").selectAll('*').remove()
 
@@ -229,28 +233,50 @@ export function getPath (projection) {
 
 export function mapMarkers(data, circlesData, tip) {
     const sizeScale = setCitRadiusScale()
-
+    
+    let tooltip2 = d3.select("#viz-container")
+      .append("div")
+      .style("position", "absolute")
+      .style("visibility", "hidden")
+      .style("background-color", "white")
+      .style("border", "solid")
+      .style("border-width", "1px")
+    .style("border-radius", "5px")
+  .style("font-size", "10px")
+.style("padding", "10px")
+.style("padding-top", "3px")
+.style("padding-bottom", "1px")
     circlesData.provinces.forEach(prov => {
         prov.villes.forEach((cit, key) => {
             let city = data.items.find(obj => obj.name.toUpperCase().normalize("NFD").replace(/\p{Diacritic}/gu, "") === key)
             if (city !== undefined) {
                 let pie = d3.pie().value(dat => dat)
                 const totalMovies = cit.nbFrancais + cit.nbAnglais
-                console.log(city.name)
-                var g = d3.select('#marker-g')
-                    .selectAll('idkWhyButYouNeedMe')
-                    .data(pie([cit.nbFrancais, cit.nbAnglais]))
-                    .enter().append('g')
-                g.append('path')
-                    .attr('d', d3.arc().innerRadius(0).outerRadius(sizeScale(totalMovies)))
-                    .attr('fill', (d) => d.data === cit.nbFrancais ? "blue" : "red")
-                    .attr('stroke', 'black')
-                    .attr('transform', `translate(${city.x}, ${city.y})`)
-                    .attr('class', 'cityPieChart')
-                g.append('title').text(city.name)
+                let path = d3.select('#marker-g')
+                  .selectAll('idkWhyButYouNeedMe')
+                  .data(pie([cit.nbFrancais, cit.nbAnglais]))
+                  .enter()
+                  .append('path')
+                
+                path.attr('d', d3.arc().innerRadius(0).outerRadius(sizeScale(totalMovies)))
+                  .attr('fill', (d) => d.data === cit.nbFrancais ? "blue" : "red")
+                  .attr('stroke', 'black')
+                  .attr('transform', `translate(${city.x}, ${city.y})`)
+                  .attr('class', 'cityPieChart')
+                
+              path.on('mouseover', function () {
+                tooltip2.html(
+                  "<strong>" + city.name + "</strong>" +
+                  "<p> Anglais: " + cit.nbAnglais + "</p>" +
+                  "<p> Français: " + cit.nbFrancais + "</p>");
+                return tooltip2.style("visibility", "visible");
+              })
             }
         })
-    })
+      })
+    d3.selectAll(".cityPieChart")
+      .on("mousemove", function() {return tooltip2.style("top", (event.pageY)+"px").style("left",(event.pageX)+"px");})
+      .on("mouseout", function() {return tooltip2.style("visibility", "hidden");});
 }
 
 /*export function setCityHoverHandler (data) {
